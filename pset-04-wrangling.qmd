@@ -150,12 +150,12 @@ cases = request(api) |> req_url_query(`$limit`=10000000000) |> req_perform() |> 
 ```{r, width = 15, height = 16}
 ## Filter out observations we don't have population data for 
 
-cases |> filter((end_date >= "2020-01-01") & (end_date <= "2021-12-31"), state %in% unique(population$state_abb)) |> mutate(year = as.character(lubridate::year(end_date))) |> left_join(select(population, state_abb, region_name, year, population), by = c("state" = "state_abb", "year" = "year")) |> mutate(cases_scaled = new_cases/ population * 100000) |> group_by(region_name) |> ggplot() + aes(x = end_date, y = cases_scaled, colour = region_name, group = region_name) + geom_line() + facet_wrap(vars(region_name)) + labs(x = "Region", y = "Deaths", title = "Deaths By Region") + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 5)) + theme(panel.spacing = unit(1, "lines")) + theme(strip.text = element_text(size = 6))
+cases |> filter((end_date >= "2020-01-01") & (end_date <= "2021-12-31"), state %in% unique(population$state_abb)) |> mutate(year = as.character(lubridate::year(end_date))) |> left_join(select(population, state_abb, region_name, year, population), by = c("state" = "state_abb", "year" = "year")) |> mutate(cases_scaled = new_cases/ population * 100000) |> group_by(region_name) |> ggplot() + aes(x = end_date, y = cases_scaled, colour = region_name, group = region_name) + geom_line() + facet_wrap(vars(region_name), ncol = 3) + labs(x = "Region", y = "Deaths", title = "Deaths By Region") + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 5), axis.text.y = element_text(size = 5)) + theme(panel.spacing = unit(1, "lines")) + theme(strip.text = element_text(size = 5))
 ```
 
 13. The dates in the `cases` dataset are stored as character strings. Use the **lubridate** package to properly parse the `date` column, then create a summary table showing the total COVID-19 cases by month and year for 2020 and 2021. The table should have columns for year, month (as month name), and total cases across all states. Order by year and month. Use the **knitr** package and `kable()` function to display the results as a formatted table.
 
-```{r}
+```{r, message = FALSE}
 library(knitr)
 cases |> filter((end_date >= "2020-01-01") & (end_date <= "2021-12-31")) |> mutate(year = lubridate::year(end_date), month = lubridate::month(end_date, label = TRUE)) |> group_by(year, month) |> summarize(`Total Cases` = sum(new_cases, na.rm = TRUE))|> arrange(year, month) |> rename(`Year` = year, `Month` = month) |> kable()
 ```

@@ -87,6 +87,8 @@ population = population |> as.tibble() |> row_to_names(row_number = 1) |> mutate
 7. As a check, make a barplot of states' 2021 and 2022 populations. Show the state names in the y-axis ordered by population size.  Hint: You will need to use `reorder` and use `facet_wrap`.
 
 ```{r, width = 10, height = 15}
+## Text overflows on axis labels 
+
 population |> group_by(year) |> ggplot() + aes(x = population, y = reorder(state_name, population)) + geom_col() + facet_wrap(vars(year)) + labs(y = "State", x = "Population", title = "State Populations in 2020 and 2021") + theme(strip.text = element_text(size = 6), axis.text.y = element_text(size = 4), axis.text.x = element_text(size = 6))
 ```
 
@@ -139,10 +141,6 @@ We see exactly 1,000 rows. We should be seeing over $52 \times 3$ rows per state
 ```{r}
 api <- "https://data.cdc.gov/resource/pwn4-m3yp.json"
 
-#response_cdc = request(api) |> req_url_query(`$limit`=10000000000) |> req_perform()
-
-#cases_raw = resp_body_json(response_cdc, simplifyVector = TRUE)
-
 cases = request(api) |> req_url_query(`$limit`=10000000000) |> req_perform() |> resp_body_json(simplifyVector = TRUE) |> select(state, end_date, new_cases) |> mutate(new_cases = as.numeric(new_cases), end_date = as.Date(end_date))
 ```
 
@@ -178,5 +176,5 @@ deaths = request(deaths_url) |> req_url_query(`$limit`=10000000000) |> req_perfo
 15. Using the `deaths` dataset you created, make a bar plot showing the total COVID-19 deaths by state. Show only the top 10 states with the highest death counts. Order the bars from highest to lowest and use appropriate labels and title.
 
 ```{r, message = FALSE}
-deaths |> filter(state %in% population$state_name) |> group_by(state) |> summarize(`Total Deaths` = sum(covid_19_deaths, na.rm = TRUE)) |> top_n(10) |> arrange(desc(`Total Deaths`)) |> ggplot() + aes(x = reorder(state, -`Total Deaths`), y = `Total Deaths`) + geom_col() + labs(x = "State", y = "Total Deaths", title = "Deaths by Covid-19 (Top 10 States)") + theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8))
+deaths |> filter(state %in% population$state_name) |> group_by(state) |> summarize(`Total Deaths` = sum(covid_19_deaths, na.rm = TRUE)) |> top_n(10) |> arrange(desc(`Total Deaths`)) |> ggplot() + aes(x = reorder(state, -`Total Deaths`), y = `Total Deaths`) + geom_col() + labs(x = "State", y = "Total Deaths", title = "Deaths by Covid-19 (Top 10 States)") + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
 ```

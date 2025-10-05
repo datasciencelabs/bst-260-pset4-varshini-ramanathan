@@ -131,7 +131,8 @@ api <- "https://data.cdc.gov/resource/pwn4-m3yp.json"
 
 ##Print out number of rows
 
-cases_raw = request(api) |> req_perform() |> resp_body_json(simplifyVector = TRUE) |> nrow() |> print()
+cases_raw = request(api) |> req_perform() |> resp_body_json(simplifyVector = TRUE)
+cases_raw |> nrow() |> print()
 ```
 
 We see exactly 1,000 rows. We should be seeing over $52 \times 3$ rows per state.
